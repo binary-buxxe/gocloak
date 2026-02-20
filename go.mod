@@ -1,6 +1,6 @@
-module github.com/Nerzal/gocloak/v13
+module github.com/binary-buxxe/gocloak/v13
 
-go 1.23.0
+go 1.25.0
 
 require (
 	github.com/go-resty/resty/v2 v2.16.5

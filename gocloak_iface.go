@@ -40,9 +40,9 @@ type GoCloakIface interface {
 	// RetrospectToken calls the openid-connect introspect endpoint
 	RetrospectToken(ctx context.Context, accessToken, clientID, clientSecret, realm string) (*IntroSpectTokenResult, error)
 	// DecodeAccessToken decodes the accessToken
-	DecodeAccessToken(ctx context.Context, accessToken, realm string) (*jwt.Token, *jwt.MapClaims, error)
+	DecodeAccessToken(ctx context.Context, accessToken, realm string, jwtOptions ...jwt.ParserOption) (*jwt.Token, *jwt.MapClaims, error)
 	// DecodeAccessTokenCustomClaims decodes the accessToken and writes claims into the given claims
-	DecodeAccessTokenCustomClaims(ctx context.Context, accessToken, realm string, claims jwt.Claims) (*jwt.Token, error)
+	DecodeAccessTokenCustomClaims(ctx context.Context, accessToken, realm string, claims jwt.Claims, jwtOptions ...jwt.ParserOption) (*jwt.Token, error)
 	// GetToken uses TokenOptions to fetch a token.
 	GetToken(ctx context.Context, realm string, options TokenOptions) (*JWT, error)
 	// GetRequestingPartyToken returns a requesting party token with permissions granted by the server

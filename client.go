@@ -19,7 +19,7 @@ import (
 	"github.com/segmentio/ksuid"
 	"golang.org/x/mod/semver"
 
-	"github.com/Nerzal/gocloak/v13/pkg/jwx"
+	"github.com/binary-buxxe/gocloak/v13/pkg/jwx"
 )
 
 // GoCloak provides functionalities to talk to Keycloak.
@@ -466,7 +466,7 @@ func (g *GoCloak) RetrospectToken(ctx context.Context, accessToken, clientID, cl
 	return &result, nil
 }
 
-func (g *GoCloak) decodeAccessTokenWithClaims(ctx context.Context, accessToken, realm string, claims jwt.Claims) (*jwt.Token, error) {
+func (g *GoCloak) decodeAccessTokenWithClaims(ctx context.Context, accessToken, realm string, claims jwt.Claims, jwtOptions ...jwt.ParserOption) (*jwt.Token, error) {
 	const errMessage = "could not decode access token"
 	accessToken = strings.Replace(accessToken, "Bearer ", "", 1)
 
@@ -488,17 +488,17 @@ func (g *GoCloak) decodeAccessTokenWithClaims(ctx context.Context, accessToken, 
 	}
 
 	if strings.HasPrefix(decodedHeader.Alg, "ES") {
-		return jwx.DecodeAccessTokenECDSACustomClaims(accessToken, usedKey.X, usedKey.Y, usedKey.Crv, claims)
+		return jwx.DecodeAccessTokenECDSACustomClaims(accessToken, usedKey.X, usedKey.Y, usedKey.Crv, claims, jwtOptions...)
 	} else if strings.HasPrefix(decodedHeader.Alg, "RS") {
-		return jwx.DecodeAccessTokenRSACustomClaims(accessToken, usedKey.E, usedKey.N, claims)
+		return jwx.DecodeAccessTokenRSACustomClaims(accessToken, usedKey.E, usedKey.N, claims, jwtOptions...)
 	}
 	return nil, fmt.Errorf("unsupported algorithm")
 }
 
 // DecodeAccessToken decodes the accessToken
-func (g *GoCloak) DecodeAccessToken(ctx context.Context, accessToken, realm string) (*jwt.Token, *jwt.MapClaims, error) {
+func (g *GoCloak) DecodeAccessToken(ctx context.Context, accessToken, realm string, jwtOptions ...jwt.ParserOption) (*jwt.Token, *jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
-	token, err := g.decodeAccessTokenWithClaims(ctx, accessToken, realm, claims)
+	token, err := g.decodeAccessTokenWithClaims(ctx, accessToken, realm, claims, jwtOptions...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -506,8 +506,8 @@ func (g *GoCloak) DecodeAccessToken(ctx context.Context, accessToken, realm stri
 }
 
 // DecodeAccessTokenCustomClaims decodes the accessToken and writes claims into the given claims
-func (g *GoCloak) DecodeAccessTokenCustomClaims(ctx context.Context, accessToken, realm string, claims jwt.Claims) (*jwt.Token, error) {
-	return g.decodeAccessTokenWithClaims(ctx, accessToken, realm, claims)
+func (g *GoCloak) DecodeAccessTokenCustomClaims(ctx context.Context, accessToken, realm string, claims jwt.Claims, jwtOptions ...jwt.ParserOption) (*jwt.Token, error) {
+	return g.decodeAccessTokenWithClaims(ctx, accessToken, realm, claims, jwtOptions...)
 }
 
 // GetToken uses TokenOptions to fetch a token.

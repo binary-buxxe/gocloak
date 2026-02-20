@@ -114,7 +114,7 @@ func decodeRSAPublicKey(e, n *string) (*rsa.PublicKey, error) {
 }
 
 // DecodeAccessTokenRSACustomClaims decodes string access token into jwt.Token
-func DecodeAccessTokenRSACustomClaims(accessToken string, e, n *string, customClaims jwt.Claims) (*jwt.Token, error) {
+func DecodeAccessTokenRSACustomClaims(accessToken string, e, n *string, customClaims jwt.Claims, jwtOptions ...jwt.ParserOption) (*jwt.Token, error) {
 	const errMessage = "could not decode accessToken with custom claims"
 	accessToken = strings.Replace(accessToken, "Bearer ", "", 1)
 
@@ -129,7 +129,7 @@ func DecodeAccessTokenRSACustomClaims(accessToken string, e, n *string, customCl
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return rsaPublicKey, nil
-	})
+	}, jwtOptions...)
 
 	if err != nil {
 		return nil, errors.Wrap(err, errMessage)
@@ -138,7 +138,7 @@ func DecodeAccessTokenRSACustomClaims(accessToken string, e, n *string, customCl
 }
 
 // DecodeAccessTokenECDSACustomClaims decodes string access token into jwt.Token
-func DecodeAccessTokenECDSACustomClaims(accessToken string, x, y, crv *string, customClaims jwt.Claims) (*jwt.Token, error) {
+func DecodeAccessTokenECDSACustomClaims(accessToken string, x, y, crv *string, customClaims jwt.Claims, jwtOptions ...jwt.ParserOption) (*jwt.Token, error) {
 	const errMessage = "could not decode accessToken"
 	accessToken = strings.Replace(accessToken, "Bearer ", "", 1)
 
@@ -153,7 +153,7 @@ func DecodeAccessTokenECDSACustomClaims(accessToken string, x, y, crv *string, c
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return publicKey, nil
-	})
+	}, jwtOptions...)
 
 	if err != nil {
 		return nil, errors.Wrap(err, errMessage)
